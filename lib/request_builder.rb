@@ -5,31 +5,17 @@ LOCATIONS = {
 }
 
 def build_url(params)
-
   url = BASE_URL
-
-  if params.has_key?(:location)
-    url += "b-" + LOCATIONS[params[:location]] + "/"
-  end
-
-  if params.has_key?(:keywords)
-    url += params[:keywords].join("-") + "/"
-  end
-
-  if params.has_key?(:page)
-    url += "page-#{params[:page]}/"
-  end
-
-  if params.has_key?(:location)
-    url += "k0l#{params[:location]}"
-  end
+  url += "b-" + LOCATIONS[params[:location]] + "/" if params.has_key?(:location)
+  url += params[:keywords].join("-") + "/" if params.has_key?(:keywords)
+  url += "page-#{params[:page]}/" if params.has_key?(:page)
+  url += "kol#{params[:location]}" if params.has_key?(:location)
 
   puts url
-
 end
 
 build_url({
-  'location': 9001,
-  'keywords':["honda", "civic"],
-  'page': 2
+  :location => 9001,
+  :keywords => ['honda', 'civic'],
+  :page => 2
 })
