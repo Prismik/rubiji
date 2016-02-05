@@ -1,7 +1,7 @@
 BASE_URL = "http://www.kijiji.ca/"
 
 LOCATIONS = {
-  "qc" => {"name" => "quebec", "code" => "9001"}
+  9001 => "quebec"
 }
 
 def build_url(params)
@@ -9,7 +9,7 @@ def build_url(params)
   url = BASE_URL
 
   if params.has_key?(:location)
-    url += "b-" + LOCATIONS[params[:location]]["name"] + "/"
+    url += "b-" + LOCATIONS[params[:location]] + "/"
   end
 
   if params.has_key?(:keywords)
@@ -21,7 +21,7 @@ def build_url(params)
   end
 
   if params.has_key?(:location)
-    url += "k0l" + LOCATIONS[params[:location]]["code"]
+    url += "k0l#{params[:location]}"
   end
 
   puts url
@@ -29,7 +29,7 @@ def build_url(params)
 end
 
 build_url({
-  'location': 'qc',
-  'keywords':["chatton", "doux"],
+  'location': 9001,
+  'keywords':["honda", "civic"],
   'page': 2
 })
