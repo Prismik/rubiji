@@ -15,7 +15,8 @@ def crawl(params)
     page.search('.regular-ad').each do |ad| 
       params[:emptyImg] = ad.at('img')['src'].include? "placeholder" # Title with placeholder = theres no image 
       params[:title] = ad.at('a.title').content.tr('\n', '').strip
-      puts "    title:#{params[:title]}, hasImage:#{!params[:emptyImg]}"
+      params[:hasPrice] = ad.at('.price').content.include? "$"
+      puts "    title:#{params[:title]}, hasImage:#{!params[:emptyImg]}, hasPrice:#{params[:hasPrice]}"
     end
 
     hasNext = page.at("//a[@title='Suivante']")
