@@ -1,9 +1,8 @@
 #!/usr/bin/ruby
 
-require 'mechanize'
+require './lib/crawler.rb'
 
-mechanize = Mechanize.new
-
-page = mechanize.get('http://stackoverflow.com/')
-
-puts page.title
+crawl({
+  :location => 9001,
+  :keywords => ['honda', 'civic']
+})
