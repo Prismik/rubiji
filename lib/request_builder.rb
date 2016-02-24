@@ -13,5 +13,3 @@ def build_url(params)
 
   return url
 end
-
-
