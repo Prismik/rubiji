@@ -11,13 +11,11 @@ def crawl(params)
     params[:page] = params[:page] + 1  
     url = build_url(params)
     page = mechanize.get(url)
-    noImage = false
-    title = ""
     puts "Fetching page #{params[:page]}" 
     page.search('.regular-ad').each do |ad| 
-      noImage = ad.at('img')['src'].include? "placeholder" # Title with placeholder = theres no image 
-      title = ad.at('a.title').content.tr('\n', '').strip
-      p "page:#{params[:page]}, title:#{title}, hasImage:#{!noImage}"
+      params[:emptyImg] = ad.at('img')['src'].include? "placeholder" # Title with placeholder = theres no image 
+      params[:title] = ad.at('a.title').content.tr('\n', '').strip
+      p "page:#{params[:page]}, title:#{params[:title]}, hasImage:#{!params[:emptyImg]}"
     end
 
     hasNext = page.at("//a[@title='Suivante']")
