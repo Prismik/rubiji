@@ -20,9 +20,10 @@ def crawl(params)
     page.search('.regular-ad').each do |ad| 
       result[:emptyImg] = ad.at('img')['src'].include? "placeholder" # Title with placeholder = theres no image 
       result[:price] = fetchPrice(ad)
+      result[:url] = ad.at('a.title')['url']
       result[:title] = ad.at('a.title').content.tr('\n', '').strip
       result[:date] = fetchDate(ad)
-      puts "    title:#{result[:title]}, hasImage:#{!result[:emptyImg]}, price:#{result[:price]}, date:#{result[:date]}"
+      puts "    url:#{url}, title:#{result[:title]}, hasImage:#{!result[:emptyImg]}, price:#{result[:price]}, date:#{result[:date]}"
     end
 
     hasNext = page.at("//a[@title='Suivante']")
@@ -41,9 +42,10 @@ end
 def fetchDate(ad)
   date = ad.at(".posted").content.strip.slice(0...10)
   if date.include? "/"
-    arr = ['day', 'month', 'year'].zip(date.split('/')) # Merge the array of keys to the date values
+    arr = [:day, :month, :year].zip(date.split('/')) # Merge the array of keys to the date values
     return Hash[arr.map {|k, v| [k, v.to_i]}] # Return them into a hash with values as integers
   end
 
-  return nil
+  now = Date.today
+  return {:day => now.day, :month => now.month, :year => now.year}
 end
