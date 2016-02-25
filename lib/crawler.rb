@@ -23,7 +23,7 @@ class Crawler
       page.search('.regular-ad').each do |ad| 
         result[:emptyImg] = ad.at('img')['src'].include? "placeholder" # Title with placeholder = theres no image 
         result[:price] = fetchPrice(ad)
-        result[:url] = ad.at('a.title')['url']
+        result[:url] = BASE_URL.chomp('/') + ad.at('a.title')['href']
         result[:title] = ad.at('a.title').content.strip
         result[:location] = fetchLocation(ad)
         result[:date] = fetchDate(ad)
