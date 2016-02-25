@@ -8,17 +8,32 @@ def crawl(params)
   hasNext = true 
   
   while hasNext
+    result = Hash.new
     params[:page] = params[:page] + 1  
+    result[:page] = params[:page]
     url = build_url(params)
     page = mechanize.get(url)
     puts "Fetching page #{params[:page]}" 
     page.search('.regular-ad').each do |ad| 
-      params[:emptyImg] = ad.at('img')['src'].include? "placeholder" # Title with placeholder = theres no image 
-      params[:title] = ad.at('a.title').content.tr('\n', '').strip
-      params[:hasPrice] = ad.at('.price').content.include? "$"
-      puts "    title:#{params[:title]}, hasImage:#{!params[:emptyImg]}, hasPrice:#{params[:hasPrice]}"
+      result[:emptyImg] = ad.at('img')['src'].include? "placeholder" # Title with placeholder = theres no image 
+      result[:price] = fetchPrice(ad)
+      result[:title] = ad.at('a.title').content.tr('\n', '').strip
+      puts "    title:#{result[:title]}, hasImage:#{!result[:emptyImg]}, price:#{result[:price]}"
     end
 
     hasNext = page.at("//a[@title='Suivante']")
   end
+end
+
+def fetchPrice(ad) 
+      price = ad.at('.price').content.strip
+      if price.include? "$"
+        return price.slice(0...(price.index(','))).gsub("\u00A0", "").to_i # Remove nbsp 
+      end
+
+      return nil
+end
+
+def fetchDate(ad)
+
 end
