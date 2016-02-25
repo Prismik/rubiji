@@ -22,8 +22,9 @@ def crawl(params)
       result[:price] = fetchPrice(ad)
       result[:url] = ad.at('a.title')['url']
       result[:title] = ad.at('a.title').content.tr('\n', '').strip
+      result[:location] = ad.at('.posted').content.strip.slice(10...ad.at('.posted').content.length) # TODO not quite working with ads with no date (today)
       result[:date] = fetchDate(ad)
-      puts "    url:#{url}, title:#{result[:title]}, hasImage:#{!result[:emptyImg]}, price:#{result[:price]}, date:#{result[:date]}"
+      puts "    url:#{url}, title:#{result[:title]}, location:#{result[:location]}, hasImage:#{!result[:emptyImg]}, price:#{result[:price]}, date:#{result[:date]}"
     end
 
     hasNext = page.at("//a[@title='Suivante']")
@@ -48,4 +49,8 @@ def fetchDate(ad)
 
   now = Date.today
   return {:day => now.day, :month => now.month, :year => now.year}
+end
+
+def fetchLocation(ad)
+  location
 end
