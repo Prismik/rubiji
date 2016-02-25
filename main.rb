@@ -2,7 +2,8 @@
 
 require './lib/crawler.rb'
 
-crawl({
+
+Crawler.new.crawl({
   :location => 9001,
   :keywords => ['imac', '2014']
 })
