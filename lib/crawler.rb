@@ -21,7 +21,8 @@ def crawl(params)
       result[:emptyImg] = ad.at('img')['src'].include? "placeholder" # Title with placeholder = theres no image 
       result[:price] = fetchPrice(ad)
       result[:title] = ad.at('a.title').content.tr('\n', '').strip
-      puts "    title:#{result[:title]}, hasImage:#{!result[:emptyImg]}, price:#{result[:price]}"
+      result[:date] = fetchDate(ad)
+      puts "    title:#{result[:title]}, hasImage:#{!result[:emptyImg]}, price:#{result[:price]}, date:#{result[:date]}"
     end
 
     hasNext = page.at("//a[@title='Suivante']")
@@ -29,17 +30,20 @@ def crawl(params)
 end
 
 def fetchPrice(ad) 
-      price = ad.at('.price').content.strip
-      if price.include? "$"
-        return price.slice(0...(price.index(','))).gsub("\u00A0", "").to_i # Remove nbsp 
-      end
+  price = ad.at('.price').content.strip
+  if price.include? "$"
+    return price.slice(0...(price.index('.'))).gsub("\u00A0", "").tr(",$", '').to_i # 0 to first . and remove nbsp, comma and dollar sign
+  end
 
-      return nil
+  return nil
 end
 
 def fetchDate(ad)
-  date = ad.at('.posted').content.strip
-  if date.include? "-"
-Date.strptime(date, "%d, %m, %a }")
+  date = ad.at(".posted").content.strip.slice(0...10)
+  if date.include? "/"
+    arr = ['day', 'month', 'year'].zip(date.split('/')) # Merge the array of keys to the date values
+    return Hash[arr.map {|k, v| [k, v.to_i]}] # Return them into a hash with values as integers
   end
+
+  return nil
 end

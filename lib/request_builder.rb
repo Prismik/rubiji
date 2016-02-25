@@ -11,5 +11,5 @@ def build_url(params)
   url += "page-#{params[:page]}/" if params.has_key?(:page)
   url += "k0l#{params[:location]}" if params.has_key?(:location)
 
-  return url
+  return "#{url}?siteLocale=en_CA"
 end
