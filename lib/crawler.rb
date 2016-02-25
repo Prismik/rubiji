@@ -2,6 +2,7 @@ require 'mechanize'
 require './lib/request_builder.rb'
 
 def crawl(params)  
+  lang = "fr"
   mechanize = Mechanize.new
  
   params[:page] = 0
@@ -13,6 +14,8 @@ def crawl(params)
     result[:page] = params[:page]
     url = build_url(params)
     page = mechanize.get(url)
+    lang = "en" if page.search('body').first['class'].include? "en"
+    puts "LANG = #{lang}"
     puts "Fetching page #{params[:page]}" 
     page.search('.regular-ad').each do |ad| 
       result[:emptyImg] = ad.at('img')['src'].include? "placeholder" # Title with placeholder = theres no image 
@@ -35,5 +38,8 @@ def fetchPrice(ad)
 end
 
 def fetchDate(ad)
-
+  date = ad.at('.posted').content.strip
+  if date.include? "-"
+Date.strptime(date, "%d, %m, %a }")
+  end
 end
