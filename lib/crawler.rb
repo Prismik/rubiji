@@ -27,11 +27,21 @@ class Crawler
         result[:title] = ad.at('a.title').content.strip
         result[:location] = fetchLocation(ad)
         result[:date] = fetchDate(ad)
+        result[:details] = fetchDetails(ad)
+        result[:description] = ad.at('.description').search('p').first.content.strip
         #puts "    url:#{url}, title:#{result[:title]}, location:#{result[:location]}, hasImage:#{!result[:emptyImg]}, price:#{result[:price]}, date:#{result[:date]}"
         pp result
       end
 
       hasNext = page.at("//a[@title='Suivante']")
+    end
+  end
+
+  def fetchDetails(ad)
+    details = ad.at('.details').content.strip
+    return nil if details.empty?
+    if details.include? '|' # It must be a car
+      return details.split('|')
     end
   end
 
