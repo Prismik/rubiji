@@ -21,7 +21,7 @@ class Crawler
       puts "LANG = #{lang}"
       puts "Fetching page #{params[:page]}" 
       page.search('.regular-ad').each do |ad| 
-        result[:emptyImg] = ad.at('img')['src'].include? "placeholder" # Title with placeholder = theres no image 
+        result[:emptyImg] = ad.at('.image').search('img').first['src'].include? "placeholder" # Title with placeholder = theres no image 
         result[:price] = fetchPrice(ad)
         result[:url] = BASE_URL.chomp('/') + ad.at('a.title')['href']
         result[:title] = ad.at('a.title').content.strip
@@ -39,10 +39,11 @@ class Crawler
 
   def fetchDetails(ad)
     details = ad.at('.details').content.strip
-    return nil if details.empty?
     if details.include? '|' # It must be a car
       return details.split('|')
     end
+
+    return nil
   end
 
   def fetchPrice(ad) 
