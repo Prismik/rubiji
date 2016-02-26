@@ -33,7 +33,7 @@ class Crawler
         pp result
       end
 
-      hasNext = page.at("//a[@title='Suivante']")
+      hasNext = page.at("//a[@title='Next']")
     end
   end
 
