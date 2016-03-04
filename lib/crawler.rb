@@ -42,7 +42,7 @@ class Crawler
   def fetchDetails(ad)
     details = ad.at('.details').content.strip
     if details.include? '|' # It must be a car
-      return details.split('|')
+      return details.split('|').map { |str| str.strip }
     end
 
     return nil
@@ -61,7 +61,7 @@ class Crawler
     if ad.at('.posted').to_s.include? '<br>'
       date = ad.at(".posted").content.strip.slice(0...DATE_FORMAT.length)
       arr = [:day, :month, :year].zip(date.split('/')) # Merge the array of keys to the date values
-      return Hash[arr.map {|k, v| [k, v.to_i]}] # Return them into a hash with values as integers
+      return Hash[arr.map { |k, v| [k, v.to_i] }] # Return them into a hash with values as integers
     end
 
     now = Date.today
