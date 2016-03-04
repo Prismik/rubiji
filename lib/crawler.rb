@@ -17,9 +17,11 @@ class Crawler
       result[:page] = params[:page]
       url = build_url(params)
       page = mechanize.get(url)
+      resultCount = page.search('.highlight').first.content.strip.tr('()', '').split(' ').last
       lang = "en" if page.search('body').first['class'].include? "en"
-      puts "LANG = #{lang}"
+      puts "\nLANG = #{lang}"
       puts "Fetching page #{params[:page]}" 
+      puts "UTD Result count = #{resultCount}"
       page.search('.regular-ad').each do |ad| 
         result[:emptyImg] = ad.at('.image').search('img').first['src'].include? "placeholder" # Title with placeholder = theres no image 
         result[:price] = fetchPrice(ad)
