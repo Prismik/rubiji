@@ -1,11 +1,13 @@
 require 'mechanize'
 require './lib/request_builder.rb'
+require 'json'
 
 class Crawler
   DATE_FORMAT = 'dd/mm/yyyy'
 
   def crawl(params)  
-    lang = "fr"
+    $stdout = STDOUT
+    lang = 'fr'
     mechanize = Mechanize.new
 
     params[:page] = 0
@@ -23,7 +25,7 @@ class Crawler
       puts "Fetching page #{params[:page]}" 
       puts "UTD Result count = #{resultCount}"
       page.search('.regular-ad').each do |ad| 
-        result[:emptyImg] = ad.at('.image').search('img').first['src'].include? "placeholder" # Title with placeholder = theres no image 
+        result[:emptyImg] = ad.at('.image').search('img').first['src'].include? 'placeholder' # Title with placeholder = theres no image 
         result[:price] = fetchPrice(ad)
         result[:url] = BASE_URL.chomp('/') + ad.at('a.title')['href']
         result[:title] = ad.at('a.title').content.strip
@@ -32,7 +34,7 @@ class Crawler
         result[:details] = fetchDetails(ad)
         result[:description] = ad.at('.description').search('p').first.content.strip
         #puts "    url:#{url}, title:#{result[:title]}, location:#{result[:location]}, hasImage:#{!result[:emptyImg]}, price:#{result[:price]}, date:#{result[:date]}"
-        pp result
+        $stdout.puts result.to_json
       end
 
       hasNext = page.at("//a[@title='Next']")
@@ -50,7 +52,7 @@ class Crawler
 
   def fetchPrice(ad) 
     price = ad.at('.price').content.strip
-    if price.include? "$"
+    if price.include? '$'
       return price.slice(0...(price.index('.'))).gsub("\u00A0", "").tr(",$", '').to_i # 0 to first . and remove nbsp, comma and dollar sign
     end
 
