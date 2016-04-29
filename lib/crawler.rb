@@ -32,7 +32,7 @@ class Crawler
         result[:location] = fetchLocation(ad)
         result[:date] = fetchDate(ad)
         result[:details] = fetchDetails(ad)
-        result[:description] = ad.at('.description').search('p').first.content.strip
+        result[:description] = ad.at('.description').content.strip
         #puts "    url:#{url}, title:#{result[:title]}, location:#{result[:location]}, hasImage:#{!result[:emptyImg]}, price:#{result[:price]}, date:#{result[:date]}"
         $stdout.puts result.to_json
       end
@@ -60,7 +60,11 @@ class Crawler
   end
 
   def fetchDate(ad)
-    if ad.at('.posted').to_s.include? '<br>'
+    posted = ad.at('.posted').to_s
+    if posted.downcase.include? 'yesterday'
+      yesterday = Date.today - 1
+      return {:day => yesterday.day, :month => yesterday.month, :year => yesterday.year}
+    elsif posted.count('/') >= 2 # Date format in english has 2 slashes (and maybe theres a 3rd from the title
       date = ad.at(".posted").content.strip.slice(0...DATE_FORMAT.length)
       arr = [:day, :month, :year].zip(date.split('/')) # Merge the array of keys to the date values
       return Hash[arr.map { |k, v| [k, v.to_i] }] # Return them into a hash with values as integers
@@ -71,8 +75,8 @@ class Crawler
   end
 
   def fetchLocation(ad)
-    location = ad.at('.posted').content.strip
-    if ad.at('.posted').to_s.include? '<br>'
+    location = ad.at('.date-posted').content.strip
+    if ad.at('.date-posted').to_s.include? '<br>'
       return location.slice((DATE_FORMAT.length+1)...location.length).strip
     end
   
