@@ -60,12 +60,12 @@ class Crawler
   end
 
   def fetchDate(ad)
-    posted = ad.at('.posted').to_s
+    posted = ad.at('.date-posted').to_s
     if posted.downcase.include? 'yesterday'
       yesterday = Date.today - 1
       return {:day => yesterday.day, :month => yesterday.month, :year => yesterday.year}
     elsif posted.count('/') >= 2 # Date format in english has 2 slashes (and maybe theres a 3rd from the title
-      date = ad.at(".posted").content.strip.slice(0...DATE_FORMAT.length)
+      date = ad.at(".date-posted").content.strip.slice(0...DATE_FORMAT.length)
       arr = [:day, :month, :year].zip(date.split('/')) # Merge the array of keys to the date values
       return Hash[arr.map { |k, v| [k, v.to_i] }] # Return them into a hash with values as integers
     end
@@ -75,11 +75,11 @@ class Crawler
   end
 
   def fetchLocation(ad)
-    location = ad.at('.date-posted').content.strip
-    if ad.at('.date-posted').to_s.include? '<br>'
-      return location.slice((DATE_FORMAT.length+1)...location.length).strip
+    location = ad.at('.location').content.strip
+    if location.downcase.include? 'yesterday'
+      return location[0...(location.length - 'yesterday'.length)].strip # Remove the date represented as "Yesterday"
+    else
+      return location[0...(location.length - DATE_FORMAT.length)].strip # Remove the date from the location node
     end
-  
-    return location
   end
 end
