@@ -1,5 +1,5 @@
 require 'mechanize'
-require './lib/request_builder.rb'
+require './request_builder.rb'
 require 'json'
 
 class Crawler
@@ -12,7 +12,8 @@ class Crawler
 
     params[:page] = 0
     hasNext = true 
-  
+    ads = []
+
     while hasNext
       result = Hash.new
       params[:page] = params[:page] + 1  
@@ -33,12 +34,14 @@ class Crawler
         result[:date] = fetchDate(ad)
         result[:details] = fetchDetails(ad)
         result[:description] = ad.at('.description').content.strip
-        #puts "    url:#{url}, title:#{result[:title]}, location:#{result[:location]}, hasImage:#{!result[:emptyImg]}, price:#{result[:price]}, date:#{result[:date]}"
-        $stdout.puts result.to_json
+        # $stdout.puts result.to_json
+        ads.push(result)
       end
 
       hasNext = page.at("//a[@title='Next']")
     end
+
+    return ads
   end
 
   def fetchDetails(ad)
