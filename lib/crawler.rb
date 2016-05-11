@@ -4,7 +4,7 @@ require 'json'
 
 class Crawler
   DATE_FORMAT = 'dd/mm/yyyy'
-
+  
   def crawl(params)  
     $stdout = STDOUT
     lang = 'fr'
@@ -13,34 +13,40 @@ class Crawler
     params[:page] = 0
     hasNext = true 
     ads = []
+    threads = []
+    url = build_url(params)
+    page = mechanize.get(url)
+    resultCount = page.search('.titlecount').first.content.strip.tr('(),', '').split(' ').last.to_i
+    pagesCount = resultCount / 20
 
-    while hasNext
-      result = Hash.new
-      params[:page] = params[:page] + 1  
-      result[:page] = params[:page]
-      url = build_url(params)
-      page = mechanize.get(url)
-      resultCount = page.search('.highlight').first.content.strip.tr('()', '').split(' ').last
-      lang = "en" if page.search('body').first['class'].include? "en"
-      puts "\nLANG = #{lang}"
-      puts "Fetching page #{params[:page]}" 
-      puts "UTD Result count = #{resultCount}"
-      page.search('.regular-ad').each do |ad| 
-        result[:emptyImg] = ad.at('.image').search('img').first['src'].include? 'placeholder' # Title with placeholder = theres no image 
-        result[:price] = fetchPrice(ad)
-        result[:url] = BASE_URL.chomp('/') + ad.at('a.title')['href']
-        result[:title] = ad.at('a.title').content.strip
-        result[:location] = fetchLocation(ad)
-        result[:date] = fetchDate(ad)
-        result[:details] = fetchDetails(ad)
-        result[:description] = ad.at('.description').content.strip
-        # $stdout.puts result.to_json
-        ads.push(result)
+    pagesCount.to_i.times do |pageNumber|
+      threads << Thread.new(pageNumber) do |thread| 
+        result = Hash.new
+        params[:page] = pageNumber + 1
+        result[:page] = pageNumber + 1
+        url = build_url(params)
+        page = mechanize.get(url)
+        lang = "en" if page.search('body').first['class'].include? "en"
+        puts "\nLANG = #{lang}"
+        puts "Fetching page #{result[:page]}" 
+        puts "UTD Result count = #{resultCount}"
+        page.search('.regular-ad').each do |ad| 
+          result[:emptyImg] = ad.at('.image').search('img').first['src'].include? 'placeholder' # Title with placeholder = theres no image 
+          result[:price] = fetchPrice(ad)
+          result[:url] = BASE_URL.chomp('/') + ad.at('a.title')['href']
+          result[:title] = ad.at('a.title').content.strip
+          result[:location] = fetchLocation(ad)
+          result[:date] = fetchDate(ad)
+          result[:details] = fetchDetails(ad)
+          result[:description] = ad.at('.description').content.strip
+          # $stdout.puts result.to_json
+          ads.push(result)
+        end
       end
-
-      hasNext = page.at("//a[@title='Next']")
-    end
-
+    end 
+    
+    threads.each { |t| t.join }
+    puts "TOTAL ADS PARSED = #{ads.count}"
     return ads
   end
 
