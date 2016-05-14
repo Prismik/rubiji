@@ -6,12 +6,12 @@ set :port, 8080
 set :environment, :production
 
 get '/ads' do
-  if params.has_key? 'keyword' 
+  if params.has_key? 'query' 
     content_type :json
     results = { }
     results = Crawler.new.crawl({
       :location => 9001,
-      :keywords => params['keyword']
+      :keywords => params['query'].split(' ')
     })
 
     return results.to_json

@@ -80,9 +80,11 @@ class Crawler
   def fetchLocation(ad)
     location = ad.at('.location').content.strip
     if location.downcase.include? 'yesterday'
-      return location[0...(location.length - 'yesterday'.length)].strip # Remove the date represented as "Yesterday"
-    else
-      return location[0...(location.length - DATE_FORMAT.length)].strip # Remove the date from the location node
+      location = location[0...(location.length - 'yesterday'.length)].strip # Remove the date represented as "Yesterday"
+    elsif location.downcase.match(/^*\d{2}\/\d{2}\/\d{4}$/)
+      location = location[0...(location.length - DATE_FORMAT.length)].strip # Remove the date from the location node
     end
+  
+    return location
   end
 end
