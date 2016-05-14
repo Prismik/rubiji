@@ -17,16 +17,16 @@ class Crawler
     url = build_url(params)
     page = mechanize.get(url)
     resultCount = page.search('.titlecount').first.content.strip.tr('(),', '').split(' ').last.to_i
-    pagesCount = resultCount / 20
+    pagesCount = (resultCount / 20.0).ceil
 
-    pagesCount.to_i.times do |pageNumber|
+    pagesCount.times do |pageNumber|
       threads << Thread.new(pageNumber) do |thread| 
         result = Hash.new
         params[:page] = pageNumber + 1
         result[:page] = pageNumber + 1
         url = build_url(params)
         page = mechanize.get(url)
-        lang = "en" if page.search('body').first['class'].include? "en"
+        lang = 'en' if page.search('body').first['class'].include? 'en'
         puts "\nLANG = #{lang}"
         puts "Fetching page #{result[:page]}" 
         puts "UTD Result count = #{resultCount}"
