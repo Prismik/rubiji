@@ -7,11 +7,9 @@ class Crawler
   
   def crawl(params)  
     $stdout = STDOUT
-    lang = 'fr'
     mechanize = Mechanize.new
 
     params[:page] = 0
-    hasNext = true 
     ads = []
     threads = []
     url = build_url(params)
@@ -26,10 +24,6 @@ class Crawler
         result[:page] = pageNumber + 1
         url = build_url(params)
         page = mechanize.get(url)
-        lang = 'en' if page.search('body').first['class'].include? 'en'
-        puts "\nLANG = #{lang}"
-        puts "Fetching page #{result[:page]}" 
-        puts "UTD Result count = #{resultCount}"
         page.search('.regular-ad').each do |ad| 
           result[:emptyImg] = ad.at('.image').search('img').first['src'].include? 'placeholder' # Title with placeholder = theres no image 
           result[:price] = fetchPrice(ad)
